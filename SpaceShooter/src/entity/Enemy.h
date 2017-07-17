@@ -10,10 +10,11 @@ namespace GameObjects
 	{
 	public:
 		explicit Enemy(
+			int level,
 			sf::Texture const *texture,
 			Utils::Resources const *resourceManager,
 			sf::Vector2f position, float speed = 15.f);
-		
+
 		~Enemy();
 
 		void Update(float const& dt);
@@ -25,6 +26,7 @@ namespace GameObjects
 
 		int getCurrentHp() const { return this->hp; }
 		int getTotalHp() const { return this->maxHp; }
+		int getLevel() const { return this->level; }
 		bool isDestroyed() const { return this->m_enemyDestorySound.getStatus() == sf::Sound::Stopped && this->exploding; }
 		bool isDestroying() const { return this->exploding; }
 
@@ -32,8 +34,10 @@ namespace GameObjects
 		void TakeDamage(int amount);
 
 	private:
-		int hp;
+		int level;
+		
 		int maxHp;
+		int hp;
 
 		int dmgMin;
 		int dmgMax;

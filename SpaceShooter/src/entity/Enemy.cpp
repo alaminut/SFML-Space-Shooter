@@ -1,10 +1,11 @@
 ﻿#include "Enemy.h"
 
-GameObjects::Enemy::Enemy(sf::Texture const *texture, Utils::Resources const *resourceManager, sf::Vector2f position, float speed) :
-	hp(50),
-	maxHp(50),
-	dmgMin(1),
-	dmgMax(2),
+GameObjects::Enemy::Enemy(int level, sf::Texture const *texture, Utils::Resources const *resourceManager, sf::Vector2f position, float speed) :
+	level(level),
+	maxHp(level * 50),
+	hp(maxHp),
+	dmgMin(level * 10),
+	dmgMax(level * 25),
 	speed(speed),
 	exploding(false),
 	direction(sf::Vector2f(-1.f, 0.f)),

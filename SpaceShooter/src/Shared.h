@@ -10,4 +10,6 @@ namespace Shared
 	constexpr float MASTER_VOLUME = 100.f;
 	constexpr float MUSIC_VOLUME = (40.f * MASTER_VOLUME) / 100.f;
 	constexpr float EFFECT_VOLUME = (60.f * MASTER_VOLUME) / 100.f;
+
+	constexpr int LEVEL_CAP = 50;
 }
