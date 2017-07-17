@@ -75,6 +75,9 @@ ipch/
 *.vsp
 *.vspx
 
+#Visual Studio Solution
+*.sln
+
 # TFS 2012 Local Workspace
 $tf/
 
