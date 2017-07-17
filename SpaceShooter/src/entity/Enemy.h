@@ -51,6 +51,8 @@ namespace GameObjects
 		sf::Texture const *m_p_Texture;
 		sf::Sound m_enemyDestorySound;
 
+		sf::RectangleShape m_BoundingBox;
+
 		Utils::Resources const *m_resourceManager;
 		Utils::Animation m_moveAnimation;
 		Utils::Animation m_deathAnimation;

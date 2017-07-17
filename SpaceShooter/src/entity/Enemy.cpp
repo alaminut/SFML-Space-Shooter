@@ -13,10 +13,14 @@ GameObjects::Enemy::Enemy(int level, sf::Texture const *texture, Utils::Resource
 	m_resourceManager(resourceManager)
 {
 	this->m_sprite.setTexture(*this->m_p_Texture);
-	this->m_sprite.setScale(1.5f, 1.5f);
+	this->m_sprite.setScale(.16f, .16f);
 	this->m_sprite.setPosition(position);
 
-	this->m_healthBar.setSize(sf::Vector2f(50.f * 1.5f, 2.f));
+	this->m_BoundingBox.setFillColor(sf::Color::Transparent);
+	this->m_BoundingBox.setOutlineColor(sf::Color::Red);
+	this->m_BoundingBox.setOutlineThickness(1.f);
+
+	this->m_healthBar.setSize(sf::Vector2f(200.f * .16f, 2.f));
 	this->m_healthBar.setFillColor(sf::Color::Red);
 
 	this->m_enemyDestorySound.setBuffer(this->m_resourceManager->audio.getResource(Shared::SoundId::S_ENEMY_DEATH));
@@ -41,13 +45,18 @@ void GameObjects::Enemy::Update(float const& dt)
 	sf::Vector2f pos(this->direction.x * this->speed * dt * 60.f, this->direction.y * this->speed * dt * 60.f);
 	this->m_sprite.move(pos);
 
-	this->m_healthBar.setPosition(this->m_sprite.getPosition().x, this->m_sprite.getPosition().y + 15.f);
+	this->m_BoundingBox.setSize(sf::Vector2f(this->getBoundingBox().width, this->getBoundingBox().height));
+	this->m_BoundingBox.setPosition(this->m_sprite.getPosition().x, this->m_sprite.getPosition().y);
+
+	this->m_healthBar.setPosition(this->m_sprite.getPosition().x, this->m_sprite.getPosition().y - 2.f);
 }
 
 void GameObjects::Enemy::Draw(sf::RenderTarget& target) const
 {
 	target.draw(this->m_healthBar);
 	target.draw(this->m_sprite);
+
+	//target.draw(this->m_BoundingBox);
 }
 
 void GameObjects::Enemy::TakeDamage(int amount)
@@ -59,7 +68,7 @@ void GameObjects::Enemy::TakeDamage(int amount)
 	if (this->hp < 0)
 		this->hp = 0;
 
-	float hpPercent = std::max<float>(0.f, (static_cast<float>(this->hp) / static_cast<float>(this->maxHp)) * this->m_sprite.getGlobalBounds().width);
+	float hpPercent = std::max<float>(0.f, (static_cast<float>(this->hp) / static_cast<float>(this->maxHp)) * 200.f * .16f);
 	this->m_healthBar.setSize(sf::Vector2f(hpPercent, 2.f));
 
 	if (this->hp == 0)
@@ -76,17 +85,22 @@ void GameObjects::Enemy::Explode()
 void GameObjects::Enemy::initAnimationFrames()
 {
 	//move animation forward
-	this->m_moveAnimation.addFrame(sf::IntRect(0, 0, 50, 50), .1f);
-	this->m_moveAnimation.addFrame(sf::IntRect(50, 0, 50, 50), .1f);
-	this->m_moveAnimation.addFrame(sf::IntRect(100, 0, 50, 50), .1f);
-	this->m_moveAnimation.addFrame(sf::IntRect(150, 0, 50, 50), .1f);
-	this->m_moveAnimation.addFrame(sf::IntRect(200, 0, 50, 50), .1f);
+	this->m_moveAnimation.addFrame(sf::IntRect(0, 0, 1000, 550), .1f);
+	this->m_moveAnimation.addFrame(sf::IntRect(1000, 0, 1000, 550), .1f);
+	this->m_moveAnimation.addFrame(sf::IntRect(2000, 0, 1000, 550), .1f);
+	this->m_moveAnimation.addFrame(sf::IntRect(3000, 0, 1000, 550), .1f);
+	this->m_moveAnimation.addFrame(sf::IntRect(4000, 0, 1000, 550), .1f);
 
 	//move animation backward
-	this->m_moveAnimation.addFrame(sf::IntRect(150, 0, 50, 50), .1f);
-	this->m_moveAnimation.addFrame(sf::IntRect(100, 0, 50, 50), .1f);
-	this->m_moveAnimation.addFrame(sf::IntRect(50, 0, 50, 50), .1f);
+	this->m_moveAnimation.addFrame(sf::IntRect(3000, 0, 1000, 550), .1f);
+	this->m_moveAnimation.addFrame(sf::IntRect(2000, 0, 1000, 550), .1f);
+	this->m_moveAnimation.addFrame(sf::IntRect(1000, 0, 1000, 550), .1f);
 
 	//death animation
-	this->m_deathAnimation.addFrame(sf::IntRect(0, 50, 50, 50), 0.f);
+	this->m_deathAnimation.addFrame(sf::IntRect(0, 600, 1000, 550), .2f);
+	this->m_deathAnimation.addFrame(sf::IntRect(1000, 600, 1000, 550), .2f);
+	this->m_deathAnimation.addFrame(sf::IntRect(2000, 600, 1000, 550), .2f);
+	this->m_deathAnimation.addFrame(sf::IntRect(3000, 600, 1000, 550), .2f);
+	this->m_deathAnimation.addFrame(sf::IntRect(4000, 600, 1000, 550), .2f);
+	this->m_deathAnimation.addFrame(sf::IntRect(0, 0, 0, 0), 0.f);
 }
