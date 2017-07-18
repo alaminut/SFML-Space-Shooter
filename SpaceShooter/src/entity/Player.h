@@ -8,6 +8,7 @@
 #include "../utils/Random.h"
 #include "../Resources.h"
 #include "Bullet.h"
+#include "../utils/Animation.h"
 
 namespace GameObjects
 {
@@ -42,6 +43,7 @@ namespace GameObjects
 
 		//Returns true if player explosion sound is NOT playing.
 		bool isDestoryComplete() const { return this->m_playerDeathSound.getStatus() == sf::Sound::Stopped; }
+		bool isDestroyed() const { return this->hp <= 0; }
 
 		//Modifiers
 		void SetPosition(sf::Vector2f const& position) { this->m_sprite.setPosition(position); }
@@ -72,6 +74,8 @@ namespace GameObjects
 
 		Utils::RandomNumberGenerator rng;
 		Utils::Resources const& m_resources;
+		Utils::Animation m_idleAnimation;
+		Utils::Animation m_explosionAnimation;
 
 		sf::Sprite m_sprite;
 		sf::RectangleShape m_healthBar;
@@ -82,6 +86,7 @@ namespace GameObjects
 		std::deque<Bullet> m_bullets;
 		std::queue<sf::Sound> m_bulletSounds;
 
+		void InitAnimationSprites();
 		void SpawnBullet(); //daha sonra bulletType parametresi eklenerek ozellestirilebilir.
 		void LevelUp();
 	};

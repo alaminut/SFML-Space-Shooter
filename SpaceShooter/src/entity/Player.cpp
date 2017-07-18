@@ -11,8 +11,8 @@ GameObjects::Player::Player(sf::Texture const& texture, Utils::Resources const& 
 	damageMax(level * 15),
 	shootTimerMax(8.f),
 	shootTimer(shootTimerMax),
-	scaleX(0.15f),
-	scaleY(0.15f),
+	scaleX(0.20f),
+	scaleY(0.20f),
 	dt(0.f),
 	maxVelocity(10.f),
 	acceleration(0.8f),
@@ -25,7 +25,6 @@ GameObjects::Player::Player(sf::Texture const& texture, Utils::Resources const& 
 	this->m_sprite.setScale(this->scaleX, this->scaleY);
 
 	//Player hp bar
-	this->m_healthBar.setSize(sf::Vector2f(this->m_sprite.getGlobalBounds().width, 2.f));
 	this->m_healthBar.setFillColor(sf::Color::Red);
 
 	//Player level display
@@ -37,6 +36,9 @@ GameObjects::Player::Player(sf::Texture const& texture, Utils::Resources const& 
 	this->m_playerDeathSound.setBuffer(this->m_resources.audio.getResource(Shared::SoundId::S_PLAYER_DEATH));
 	this->m_playerDeathSound.setVolume(Shared::EFFECT_VOLUME);
 	this->m_playerDeathSound.setLoop(false);
+
+	//Player animations
+	this->InitAnimationSprites();
 }
 
 GameObjects::Player::~Player()
@@ -152,7 +154,9 @@ void GameObjects::Player::Update(float const& dt, sf::Vector2u const& windowBoun
 	if (this->shootTimer < this->shootTimerMax)
 		this->shootTimer += 1.f * this->dt * 60.f;
 
-	//Set health bar position
+	//Set health bar position & size
+	float hpSize = (static_cast<float>(this->hp) / static_cast<float>(this->hpMax)) * this->m_sprite.getGlobalBounds().width;
+	this->m_healthBar.setSize(sf::Vector2f(hpSize, 2.f));
 	this->m_healthBar.setPosition(this->m_sprite.getPosition().x, this->m_sprite.getPosition().y);
 
 	//Set level display position
@@ -189,9 +193,22 @@ void GameObjects::Player::Draw(sf::RenderTarget &target)
 		}
 	}
 
+	//Set player texture rect
+	if (this->m_playerDeathSound.getStatus() == sf::Sound::Playing)
+	{
+		this->m_sprite.setTextureRect(this->m_explosionAnimation.getFrame());
+	}
+	else
+	{
+		this->m_sprite.setTextureRect(this->m_idleAnimation.getFrame());
+	}
+
 	target.draw(this->m_sprite);
-	target.draw(this->m_healthBar);
-	target.draw(this->m_levelDisplay);
+	if (!this->isDestroyed())
+	{
+		target.draw(this->m_healthBar);
+		target.draw(this->m_levelDisplay);
+	}
 }
 
 void GameObjects::Player::TakeDamage(int amount)
@@ -200,9 +217,6 @@ void GameObjects::Player::TakeDamage(int amount)
 
 	if (this->hp < 0)
 		this->hp = 0;
-
-	float hpSize = (static_cast<float>(this->hp) / static_cast<float>(this->hpMax)) * this->m_sprite.getGlobalBounds().width;
-	this->m_healthBar.setSize(sf::Vector2f(hpSize, 2.f));
 }
 
 void GameObjects::Player::Destroy()
@@ -225,6 +239,19 @@ void GameObjects::Player::AddScore(int modifier)
 }
 
 
+void GameObjects::Player::InitAnimationSprites()
+{
+	//Idle animation (no frames)
+	this->m_idleAnimation.addFrame(sf::IntRect(0, 0, 440, 470), 0.f);
+
+	//Explosion animation
+	this->m_explosionAnimation.addFrame(sf::IntRect(0, 470, 440, 470), .1f);
+	this->m_explosionAnimation.addFrame(sf::IntRect(440, 470, 440, 470), .1f);
+	this->m_explosionAnimation.addFrame(sf::IntRect(880, 470, 440, 470), .1f);
+	this->m_explosionAnimation.addFrame(sf::IntRect(1320, 470, 440, 470), .1f);
+	this->m_explosionAnimation.addFrame(sf::IntRect(0, 0, 0, 0), 0.f);
+}
+
 void GameObjects::Player::SpawnBullet()
 {
 	sf::FloatRect boundingBox = this->m_sprite.getGlobalBounds();
@@ -244,11 +271,11 @@ void GameObjects::Player::LevelUp()
 {
 	this->level++;
 	this->exp = 0.0;
-	
+
 	//update hp
 	this->hpMax = this->level * 100;
 	this->hp = this->hpMax;
-	
+
 	//update damage
 	this->damageMin = this->level * 5;
 	this->damageMax = this->level * 15;
